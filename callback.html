@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Autorização — Modo Caos</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  textarea { width: 100%; min-height: 120px; background: #1b1b21; color: var(--fg); border: 1px solid #2a2a31;
+             border-radius: 8px; padding: 12px; font: 13px/1.4 ui-monospace, Consolas, monospace; resize: vertical; }
+  button { margin-top: 12px; background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+           padding: 10px 18px; font-size: 1rem; cursor: pointer; }
+  .ok { color: #3ddc84; } .err { color: #ff6b6b; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Modo <span>Caos</span></h1>
+  <p id="msg" class="muted">Lendo a resposta da autorização…</p>
+  <textarea id="url" readonly></textarea>
+  <button id="copy" type="button">Copiar URL</button>
+  <p class="muted">Cole esta URL no terminal onde o comando <code>python -m gtaplay auth …</code> está esperando.
+  Esta página não envia nada para lugar nenhum.</p>
+</main>
+<script>
+  const params = new URLSearchParams(location.search);
+  const msg = document.getElementById("msg");
+  const box = document.getElementById("url");
+  box.value = location.href;
+  if (params.get("error")) {
+    msg.className = "err";
+    msg.textContent = "Autorização recusada: " + params.get("error") + " " + (params.get("error_description") || "");
+  } else if (params.get("code")) {
+    msg.className = "ok";
+    msg.textContent = "Autorização recebida. Copie a URL abaixo e cole no terminal.";
+  } else {
+    msg.textContent = "Nenhum código de autorização nesta URL.";
+  }
+  document.getElementById("copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(box.value); } catch { box.select(); document.execCommand("copy"); }
+    document.getElementById("copy").textContent = "Copiado!";
+  };
+</script>
+</body>
+</html>
